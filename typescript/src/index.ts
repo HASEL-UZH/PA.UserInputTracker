@@ -148,6 +148,7 @@ export class UserInputTracker implements ITracker {
   stop(): void {
     if (this.ref) clearInterval(this.ref);
     this.isRunning = false;
+    ioHook.stop();
   }
 
   terminate(): void {
@@ -158,7 +159,6 @@ export class UserInputTracker implements ITracker {
 
   private registerUserInputHooks() {
     ioHook.on("mouseclick", (e: MouseClickEvent) => {
-      console.log("mouse click");
       const event = {
         ...e,
         ts: new Date(),
