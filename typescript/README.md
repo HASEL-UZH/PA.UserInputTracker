@@ -14,6 +14,8 @@ const tracker = new UserInputTracker(function (aggregate) {
 tracker.start();
 ```
 
+> Consumers might have to specify targets for iohook in `package.json`. See an example [here](https://wilix-team.github.io/iohook/usage.html)
+
 ## Platform specific notes
 
 Not tested on Linux
