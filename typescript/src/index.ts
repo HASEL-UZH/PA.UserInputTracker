@@ -191,5 +191,3 @@ class UserInputTracker implements ITracker {
     ioHook.start();
   }
 }
-
-const tracker = new UserInputTracker((agg) => console.log(agg)).start();

@@ -7,19 +7,19 @@ This tracker can be used to listen to user inputs (mouse clicks, keystrokes, mou
 Add this git repository to your project as a git submodule
 
 ```
-
+git submodule add https://github.com/HASEL-UZH/PA.UserInputTracker/tree/main/typescript
 ```
 
 Install the package by adding to package.json and running npm install
 
 ```
-
+npm i ./PA.UserInputTracker/typescript
 ```
 
 The simplest example looks as follows
 
 ```ts
-import { UserInputTracker } from "";
+import { UserInputTracker } from "user-input-tracker";
 
 const tracker = new UserInputTracker(function (aggregate) {
   console.log(aggregate);
