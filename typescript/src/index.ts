@@ -54,11 +54,6 @@ export class UserInputTracker implements ITracker {
       // calculate aggregate and fire callback once done
       const aggregate = this.aggregate();
       this.onAggregated(aggregate);
-
-      console.log(this.keystrokeBuffer);
-      console.log(this.mouseClickBuffer);
-      console.log(this.mouseScrollsBuffer);
-      console.log(this.mouseMovementBuffer);
     }, this.aggregatingInterval);
   }
 
