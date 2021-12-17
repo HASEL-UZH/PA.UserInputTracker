@@ -10,7 +10,8 @@
   "scripts": {
     "build": "tsc",
     "start": "npm run build && node dist/index.js",
-    "test": "jest --config jest.config.json"
+    "test": "jest --config jest.config.json",
+    "prepare": "npm run build"
   },
   "author": "Dario Bugmann",
   "license": "ISC",

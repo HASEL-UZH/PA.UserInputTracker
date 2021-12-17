@@ -45,6 +45,8 @@ class UserInputTracker implements ITracker {
       return;
     }
 
+    console.log(`starting ${this.name}`);
+
     // register hooks
     this.registerUserInputHooks();
 
@@ -189,3 +191,5 @@ class UserInputTracker implements ITracker {
     ioHook.start();
   }
 }
+
+const tracker = new UserInputTracker((agg) => console.log(agg)).start();

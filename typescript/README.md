@@ -4,9 +4,23 @@ This tracker can be used to listen to user inputs (mouse clicks, keystrokes, mou
 
 ## How to use
 
+Add this git repository to your project as a git submodule
+
+```
+
+```
+
+Install the package by adding to package.json and running npm install
+
+```
+
+```
+
 The simplest example looks as follows
 
 ```ts
+import { UserInputTracker } from "";
+
 const tracker = new UserInputTracker(function (aggregate) {
   console.log(aggregate);
 });
