@@ -3,4 +3,5 @@ export default interface ITRacker {
   isRunning: boolean;
   start(): void;
   stop(): void;
+  terminate(): void;
 }

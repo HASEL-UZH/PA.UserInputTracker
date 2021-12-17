@@ -13,7 +13,7 @@ import {
   MouseScrollEvent,
 } from "./types/Events";
 
-class UserInputTracker implements ITracker {
+export class UserInputTracker implements ITracker {
   name = "UserInputTracker";
   isRunning = false;
   private ref: NodeJS.Timeout | undefined;
@@ -150,11 +150,17 @@ class UserInputTracker implements ITracker {
   stop(): void {
     if (this.ref) clearInterval(this.ref);
     this.isRunning = false;
+    ioHook.stop();
+  }
+
+  terminate(): void {
+    this.stop();
+    ioHook.stop();
+    ioHook.unload();
   }
 
   private registerUserInputHooks() {
     ioHook.on("mouseclick", (e: MouseClickEvent) => {
-      console.log("mouse click");
       const event = {
         ...e,
         ts: new Date(),
