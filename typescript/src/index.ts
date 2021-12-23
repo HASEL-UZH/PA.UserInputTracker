@@ -21,8 +21,6 @@ export class UserInputTracker implements ITracker {
   onAggregated: (userInputAggregate: UserInputAggregate) => void;
   aggregatingInterval: number;
 
-  private _prevEndTs: Date | undefined;
-
   private keystrokeBuffer: ExtendedKeystrokeEvent[] = [];
   private mouseClickBuffer: ExtendedMouseClickEvent[] = [];
   private mouseMovementBuffer: ExtendedMouseMoveEvent[] = [];
@@ -37,6 +35,9 @@ export class UserInputTracker implements ITracker {
   ) {
     this.onAggregated = onAggregated;
     this.aggregatingInterval = aggregatingInterval;
+
+    // register hooks
+    this.registerUserInputHooks();
   }
 
   start(): void {
@@ -47,37 +48,21 @@ export class UserInputTracker implements ITracker {
 
     console.log(`starting ${this.name}`);
 
-    // register hooks
-    this.registerUserInputHooks();
-
     this.ref = setInterval(() => {
       // calculate aggregate and fire callback once done
       const aggregate = this.aggregate();
       this.onAggregated(aggregate);
     }, this.aggregatingInterval);
+
+    ioHook.start();
   }
 
   aggregate(): UserInputAggregate {
-    let tsStart: Date;
-    let tsEnd: Date;
-
-    if (!this._prevEndTs) {
-      const now = new Date();
-      tsEnd = new Date(now);
-      tsStart = new Date(
-        now.setMilliseconds(now.getMilliseconds() - this.aggregatingInterval)
-      );
-    } else {
-      tsStart = this._prevEndTs;
-      const tsStartCopy = new Date(tsStart);
-      tsEnd = new Date(
-        tsStartCopy.setMilliseconds(
-          tsStartCopy.getMilliseconds() + this.aggregatingInterval
-        )
-      );
-    }
-
-    this._prevEndTs = tsEnd;
+    const now = new Date();
+    const tsEnd = new Date(now);
+    const tsStart = new Date(
+      now.setMilliseconds(now.getMilliseconds() - this.aggregatingInterval)
+    );
 
     // init aggregate
     const aggregate: UserInputAggregate = {
@@ -188,7 +173,5 @@ export class UserInputTracker implements ITracker {
       };
       this.mouseScrollsBuffer.push(event);
     });
-
-    ioHook.start();
   }
 }
