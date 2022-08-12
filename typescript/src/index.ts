@@ -1,4 +1,4 @@
-import ioHook from "iohook";
+import { uIOhook, UiohookKeyboardEvent, UiohookMouseEvent, UiohookWheelEvent } from 'uiohook-napi'
 
 import ITracker from "./types/ITracker";
 import UserInputAggregate from "./types/UserInputAggregate";
@@ -7,10 +7,6 @@ import {
   ExtendedMouseClickEvent,
   ExtendedMouseMoveEvent,
   ExtendedMouseScrollEvent,
-  KeystrokeEvent,
-  MouseClickEvent,
-  MouseMoveEvent,
-  MouseScrollEvent,
 } from "./types/Events";
 
 export class UserInputTracker implements ITracker {
@@ -54,7 +50,7 @@ export class UserInputTracker implements ITracker {
       this.onAggregated(aggregate);
     }, this.aggregatingInterval);
 
-    ioHook.start();
+    uIOhook.start();
   }
 
   aggregate(): UserInputAggregate {
@@ -130,17 +126,16 @@ export class UserInputTracker implements ITracker {
   stop(): void {
     if (this.ref) clearInterval(this.ref);
     this.isRunning = false;
-    ioHook.stop();
+    uIOhook.stop();
   }
 
   terminate(): void {
     this.stop();
-    ioHook.stop();
-    ioHook.unload();
+    uIOhook.stop();
   }
 
   private registerUserInputHooks() {
-    ioHook.on("mouseclick", (e: MouseClickEvent) => {
+    uIOhook.on("click", (e: UiohookMouseEvent) => {
       const event = {
         ...e,
         ts: new Date(),
@@ -149,7 +144,7 @@ export class UserInputTracker implements ITracker {
       this.mouseClickBuffer.push(event);
     });
 
-    ioHook.on("keyup", (e: KeystrokeEvent) => {
+    uIOhook.on("keyup", (e: UiohookKeyboardEvent) => {
       const event = {
         ...e,
         ts: new Date(),
@@ -158,7 +153,7 @@ export class UserInputTracker implements ITracker {
       this.keystrokeBuffer.push(event);
     });
 
-    ioHook.on("mousemove", (e: MouseMoveEvent) => {
+    uIOhook.on("mousemove", (e: UiohookMouseEvent) => {
       const event = {
         ...e,
         ts: new Date(),
@@ -166,7 +161,7 @@ export class UserInputTracker implements ITracker {
       this.mouseMovementBuffer.push(event);
     });
 
-    ioHook.on("mousewheel", (e: MouseScrollEvent) => {
+    uIOhook.on("wheel", (e: UiohookWheelEvent) => {
       const event = {
         ...e,
         ts: new Date(),

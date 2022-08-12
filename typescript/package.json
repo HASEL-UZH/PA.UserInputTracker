@@ -23,6 +23,6 @@
     "typescript": "^4.4.4"
   },
   "dependencies": {
-    "iohook": "^0.9.3"
+    "uiohook-napi": "^1.3.0"
   }
 }
