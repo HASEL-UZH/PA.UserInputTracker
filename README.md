@@ -1,3 +1,3 @@
 # PA.UserInputTracker
 
-Please find the tracker for node/Electron [here](/typescript/README.md).
+Please find the UserInputTracker written in TypeScript to be used  for Node/Electron-Apps [here](/typescript/README.md).
