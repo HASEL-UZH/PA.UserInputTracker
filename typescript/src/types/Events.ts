@@ -1,4 +1,4 @@
-import { UiohookKeyboardEvent, UiohookMouseEvent, UiohookWheelEvent } from "uiohook-napi";
+import { UiohookKeyboardEvent, UiohookMouseEvent, UiohookWheelEvent } from "hasel-io-lib";
 
 export interface ExtendedKeystrokeEvent extends UiohookKeyboardEvent {
   ts: Date;

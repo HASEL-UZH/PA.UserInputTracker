@@ -23,6 +23,6 @@
     "typescript": "^4.4.4"
   },
   "dependencies": {
-    "uiohook-napi": "file:uiohook-napi"
+    "hasel-io-lib": "^1.5.0"
   }
 }

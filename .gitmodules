@@ -1,3 +1,0 @@
-[submodule "typescript/uiohook-napi"]
-	path = typescript/uiohook-napi
-	url = https://github.com/HASEL-UZH/uiohook-napi.git
