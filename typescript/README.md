@@ -28,20 +28,15 @@ const tracker = new UserInputTracker(function (aggregate) {
 tracker.start();
 ```
 
-> Consumers might have to specify targets for iohook in `package.json`. See an example [here](https://wilix-team.github.io/iohook/usage.html)
-
 ## Platform specific notes
 
 Not tested on Linux
 
 ## Known Issues
 
-See https://github.com/wilix-team/iohook/issues/354 for the github issues of the upstream dependency
-Personally, I have encountered the following issues:
-
-1. When running in Electron, typing CAPS lock causes the main process to crash
-2. On MacOS: On certain versions of node everything works fine until you start typing. Then, ioHook stops listening for inputs.
+- There is a [bug](https://stackoverflow.com/questions/2969110/cgeventtapcreate-breaks-down-mysteriously-with-key-down-events#2971217) on macOS that removes event listeners from time to time. [uiohook-napi](https://github.com/SnosMe/uiohook-napi) crashes when this happens (when used with Electron). This issue was [reported](https://github.com/SnosMe/uiohook-napi/pull/5), but it doesn't look like it will be fixed in the near future. To circumvent this issue, we created a [fork](https://github.com/HASEL-UZH/uiohook-napi). With the fork, the application no longer crashes but a restart of the tracker is required to reestablish the event listeners. This functionality has to be provided by the client application! As a reference, you could have a look at the [fallback](https://github.com/HASEL-UZH/PA.FlowTeams/commit/cef8c28eed34c82f37aa0f8e34f9f3b520ca9f66) created in the FlowTeams project.
+  - Read more about it in this [issue](https://github.com/HASEL-UZH/PA.UserInputTracker/issues/4).
 
 ## Thanks
 
-Huge thanks to the maintainers of iohook: https://github.com/wilix-team/iohook/
+Huge thanks to the maintainers of uiohook-napi: https://github.com/SnosMe/uiohook-napi
