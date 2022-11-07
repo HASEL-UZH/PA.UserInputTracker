@@ -1,36 +1,17 @@
-export interface KeystrokeEvent {
-  type: string;
-}
+import { UiohookKeyboardEvent, UiohookMouseEvent, UiohookWheelEvent } from "hasel-io-lib";
 
-export interface MouseClickEvent {
-  type: string;
-  clicks: number;
-}
-
-export interface MouseMoveEvent {
-  type: string;
-  x: number;
-  y: number;
-}
-
-export interface MouseScrollEvent {
-  type: string;
-  amount: number;
-  rotation: number;
-}
-
-export interface ExtendedKeystrokeEvent extends KeystrokeEvent {
+export interface ExtendedKeystrokeEvent extends UiohookKeyboardEvent {
   ts: Date;
 }
 
-export interface ExtendedMouseClickEvent extends MouseClickEvent {
+export interface ExtendedMouseClickEvent extends UiohookMouseEvent {
   ts: Date;
 }
 
-export interface ExtendedMouseMoveEvent extends MouseMoveEvent {
+export interface ExtendedMouseMoveEvent extends UiohookMouseEvent {
   ts: Date;
 }
 
-export interface ExtendedMouseScrollEvent extends MouseScrollEvent {
+export interface ExtendedMouseScrollEvent extends UiohookWheelEvent {
   ts: Date;
 }

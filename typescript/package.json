@@ -23,6 +23,6 @@
     "typescript": "^4.4.4"
   },
   "dependencies": {
-    "iohook": "^0.9.3"
+    "hasel-io-lib": "^1.5.0"
   }
 }
