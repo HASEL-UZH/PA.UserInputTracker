@@ -44,6 +44,8 @@ export class UserInputTracker implements ITracker {
 
     console.log(`starting ${this.name}`);
 
+    this.isRunning = true;
+
     this.ref = setInterval(() => {
       // calculate aggregate and fire callback once done
       const aggregate = this.aggregate();
