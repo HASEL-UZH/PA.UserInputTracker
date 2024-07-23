@@ -1,7 +1,11 @@
 {
   "name": "user-input-tracker",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A cross-platform user input tracker",
+  "author": {
+    "name": "HASEL",
+    "email": "dev@hasel.dev"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -13,8 +17,6 @@
     "test": "jest --config jest.config.json",
     "prepare": "npm run build"
   },
-  "author": "Dario Bugmann",
-  "license": "ISC",
   "devDependencies": {
     "@types/jest": "^29.5.12",
     "@types/node": "^20.11.20",
@@ -23,6 +25,6 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "hasel-io-lib": "^1.5.0"
+    "uiohook-napi": "^1.5.4"
   }
 }
