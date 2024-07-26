@@ -1,4 +1,4 @@
-import { uIOhook, UiohookKeyboardEvent, UiohookMouseEvent, UiohookWheelEvent } from 'hasel-io-lib'
+import { uIOhook, UiohookKeyboardEvent, UiohookMouseEvent, UiohookWheelEvent } from 'uiohook-napi';
 
 import ITracker from "./types/ITracker";
 import UserInputAggregate from "./types/UserInputAggregate";
