@@ -10,7 +10,7 @@ import {
 } from "./types/Events";
 
 export class UserInputTracker implements ITracker {
-  name = "UserInputTracker";
+  name = "User Input Monitor";
   isRunning = false;
   private ref: NodeJS.Timeout | undefined;
 
