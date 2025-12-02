@@ -196,16 +196,22 @@ export class UserInputTracker implements ITracker {
     });
 
     uIOhook.on('keyup', (e: UiohookKeyboardEvent) => {
+      console.log('Raw key event:', e);
+
       const event: ExtendedKeystrokeEvent = {
         ...e,
         ts: new Date()
       };
 
       if (this.collectKeyDetails) {
-        // attempt to classify the keystroke if detail collection is enabled
         try {
-          event.category = this.classifyKey(e);
-        } catch {
+          const c = this.classifyKey(e);
+          console.log('Raw key event:', JSON.stringify(e, null, 2));
+          const keychar: number | undefined = (e as unknown as { keychar?: number }).keychar;
+          console.log('Classifier input:', JSON.stringify(e, null, 2), 'keychar=', keychar);
+          event.category = c;
+        } catch (err) {
+          console.log('Classification error:', err);
           event.category = 'other';
         }
       }
@@ -232,16 +238,53 @@ export class UserInputTracker implements ITracker {
 }
 
 function defaultClassifier(e: UiohookKeyboardEvent): KeystrokeCategory {
-  const { keychar } = e as unknown as { keychar?: number };
+  const code = e.keycode;
 
-  if (typeof keychar === 'number' && keychar > 0) {
-    if (keychar === 32) return 'space';
-    if (keychar === 9) return 'tab';
-    if (keychar === 13 || keychar === 10) return 'enter';
-
-    const ch = String.fromCharCode(keychar);
-    if (/[A-Za-z]/.test(ch)) return 'letter';
-    if (/[0-9]/.test(ch)) return 'number';
+  // Letters A–Z (HID usage 4–29)
+  if (code >= 4 && code <= 29) {
+    return 'letter';
   }
+
+  // Number row 1–0 (HID usage 30–39)
+  if (code >= 30 && code <= 39) {
+    return 'number';
+  }
+
+  // Numpad digits 0–9 (HID usage 89–98)
+  if (code >= 89 && code <= 98) {
+    return 'number';
+  }
+
+  // Space
+  if (code === 44) {
+    return 'space';
+  }
+
+  // Tab
+  if (code === 43) {
+    return 'tab';
+  }
+
+  // Enter (main) + keypad Enter
+  if (code === 40 || code === 88) {
+    return 'enter';
+  }
+
+  // Backspace (42) / Delete (76)
+  if (code === 42 || code === 76) {
+    return 'delete';
+  }
+
+  // Navigation keys: arrows (79–82) + home/end/page up/down (74–77)
+  if ((code >= 79 && code <= 82) || (code >= 74 && code <= 77)) {
+    return 'navigate';
+  }
+
+  // Modifiers: Shift / Ctrl / Alt / Meta (224–231)
+  if (code >= 224 && code <= 231) {
+    return 'modifier';
+  }
+
+  // Everything else: function keys, IME, media keys, unknown
   return 'other';
 }
