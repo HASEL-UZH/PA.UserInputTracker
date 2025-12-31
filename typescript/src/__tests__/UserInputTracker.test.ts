@@ -1,3 +1,17 @@
+jest.mock('uiohook-napi', () => {
+  return {
+    uIOhook: {
+      start: jest.fn(),
+      stop: jest.fn(),
+      on: jest.fn(),
+      off: jest.fn(),
+    },
+    UiohookKeyboardEvent: class {},
+    UiohookMouseEvent: class {},
+    UiohookWheelEvent: class {},
+  };
+});
+
 import assert from 'assert'
 import { UserInputTracker } from '../index'
 
