@@ -211,8 +211,6 @@ export class UserInputTracker implements ITracker {
         }
       }
 
-      console.log('Key event captured:', e, ' category: ', event.category); // TODO: temp
-
       this.keystrokeBuffer.push(event);
     });
 
