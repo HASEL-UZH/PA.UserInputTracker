@@ -205,10 +205,13 @@ export class UserInputTracker implements ITracker {
       if (this.collectKeyDetails) {
         try {
           event.category = defaultClassifier(e);
-        } catch {
+        } catch (err) {
+          console.log('Classification error:', err);
           event.category = 'other';
         }
       }
+
+      console.log('Key event captured:', e, ' category: ', event.category); // TODO: temp
 
       this.keystrokeBuffer.push(event);
     });
