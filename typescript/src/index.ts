@@ -18,7 +18,6 @@ import {
 
 type UserInputTrackerOptions = {
   collectKeyDetails?: boolean;
-  classifyKey?: (e: UiohookKeyboardEvent) => KeystrokeCategory;
 };
 
 export class UserInputTracker implements ITracker {
@@ -35,18 +34,17 @@ export class UserInputTracker implements ITracker {
   private mouseScrollsBuffer: ExtendedMouseScrollEvent[] = [];
 
   private collectKeyDetails: boolean;
-  private classifyKey: (e: UiohookKeyboardEvent) => KeystrokeCategory;
 
   constructor(
     onAggregated: (userInputAggregate: UserInputAggregate) => void,
     aggregatingInterval = 20000,
-    options: UserInputTrackerOptions = {}
+    options: UserInputTrackerOptions | boolean = {}
   ) {
     this.onAggregated = onAggregated;
     this.aggregatingInterval = aggregatingInterval;
 
-    this.collectKeyDetails = options?.collectKeyDetails ?? false;
-    this.classifyKey = options.classifyKey ?? defaultClassifier;
+    this.collectKeyDetails =
+      typeof options === 'boolean' ? options : (options?.collectKeyDetails ?? false);
 
     // register hooks
     this.registerUserInputHooks();
@@ -54,11 +52,8 @@ export class UserInputTracker implements ITracker {
 
   start(): void {
     if (this.isRunning) {
-      console.log(`${this.name} is already running!`);
       return;
     }
-
-    console.log(`starting ${this.name}`);
 
     this.isRunning = true;
 
@@ -144,21 +139,6 @@ export class UserInputTracker implements ITracker {
       aggregate.keysTab = keysTab;
       aggregate.keyEnter = keyEnter;
       aggregate.keysOther = keysOther;
-
-      console.log('[UserInputTracker] keystroke breakdown for interval', {
-        tsStart,
-        tsEnd,
-        keysTotal: keystrokes.length,
-        keysLetter,
-        keysNumber,
-        keysNavigate,
-        keysDelete,
-        keysModifier,
-        keysSpace,
-        keysTab,
-        keyEnter,
-        keysOther
-      });
     }
 
     // Mouse clicks
@@ -185,14 +165,6 @@ export class UserInputTracker implements ITracker {
     // Mouse scroll distance
     const mousescrolls = this.mouseScrollsBuffer.filter((e) => e.ts >= tsStart && e.ts < tsEnd);
     aggregate.scrollDelta = mousescrolls.reduce((a, b) => a + Math.abs(b.amount * b.rotation), 0);
-
-    console.log('[UserInputTracker] mouse/scroll breakdown for interval', {
-      tsStart,
-      tsEnd,
-      clickTotal: aggregate.clickTotal,
-      movedDistance: aggregate.movedDistance,
-      scrollDelta: aggregate.scrollDelta
-    });
 
     // remove saved entries from buffer
     this.keystrokeBuffer = this.keystrokeBuffer.filter((e) => e.ts >= tsEnd);
@@ -221,14 +193,10 @@ export class UserInputTracker implements ITracker {
         ts: new Date()
       };
 
-      console.log('[UserInputTracker] mouse click event', event);
-
       this.mouseClickBuffer.push(event);
     });
 
     uIOhook.on('keyup', (e: UiohookKeyboardEvent) => {
-      console.log('Raw key event:', e);
-
       const event: ExtendedKeystrokeEvent = {
         ...e,
         ts: new Date()
@@ -236,30 +204,8 @@ export class UserInputTracker implements ITracker {
 
       if (this.collectKeyDetails) {
         try {
-          const c = this.classifyKey(e);
-          const keychar: number | undefined = (e as unknown as { keychar?: number }).keychar;
-
-          console.log(
-            '[KeyClassifier]',
-            'keycode =',
-            e.keycode,
-            'keychar =',
-            keychar,
-            'alt =',
-            e.altKey,
-            'ctrl =',
-            e.ctrlKey,
-            'shift =',
-            e.shiftKey,
-            'meta =',
-            e.metaKey,
-            '=> category =',
-            c
-          );
-
-          event.category = c;
-        } catch (err) {
-          console.log('Classification error:', err);
+          event.category = defaultClassifier(e);
+        } catch {
           event.category = 'other';
         }
       }
@@ -273,8 +219,6 @@ export class UserInputTracker implements ITracker {
         ts: new Date()
       };
 
-      console.log('[UserInputTracker] mouse move event', event);
-
       this.mouseMovementBuffer.push(event);
     });
 
@@ -283,8 +227,6 @@ export class UserInputTracker implements ITracker {
         ...e,
         ts: new Date()
       };
-
-      console.log('[UserInputTracker] wheel event', event);
 
       this.mouseScrollsBuffer.push(event);
     });
@@ -303,83 +245,70 @@ function getPhysicalKeyName(e: UiohookKeyboardEvent): string | undefined {
 function defaultClassifier(e: UiohookKeyboardEvent): KeystrokeCategory {
   const code = e.keycode;
   const keyName = getPhysicalKeyName(e);
+  const isTopRowDigitCode = code >= 2 && code <= 11;
+  const isNumpadDigitCode = code >= 71 && code <= 83;
+  const isArrowCode =
+    code === UiohookKey.ArrowUp ||
+    code === UiohookKey.ArrowDown ||
+    code === UiohookKey.ArrowLeft ||
+    code === UiohookKey.ArrowRight;
+  const isNavPagingCode =
+    code === UiohookKey.Home ||
+    code === UiohookKey.End ||
+    code === UiohookKey.PageUp ||
+    code === UiohookKey.PageDown;
 
-  // Letters A–Z (physical keys, independent of layout)
-  if (keyName && /^Key[A-Z]$/.test(keyName)) {
-    console.log('[KeyClassifier:letter]', 'keycode =', code);
-    return 'letter';
+  switch (true) {
+    case !!keyName && /^[A-Z]$/.test(keyName):
+      return 'letter';
+    case !!keyName && /^[0-9]$/.test(keyName):
+      return 'number';
+    case !!keyName && /^Numpad[0-9]$/.test(keyName):
+      return 'number';
+    case isTopRowDigitCode || isNumpadDigitCode:
+      return 'number';
+    case keyName === 'Space' || code === UiohookKey.Space:
+      return 'space';
+    case keyName === 'Tab' || code === UiohookKey.Tab:
+      return 'tab';
+    case keyName === 'Enter' || keyName === 'NumpadEnter' || code === UiohookKey.Enter:
+      return 'enter';
+    case keyName === 'Backspace' ||
+      keyName === 'Delete' ||
+      code === UiohookKey.Backspace ||
+      code === UiohookKey.Delete:
+      return 'delete';
+    case keyName === 'ArrowUp' ||
+      keyName === 'ArrowDown' ||
+      keyName === 'ArrowLeft' ||
+      keyName === 'ArrowRight' ||
+      keyName === 'Home' ||
+      keyName === 'End' ||
+      keyName === 'PageUp' ||
+      keyName === 'PageDown' ||
+      isArrowCode ||
+      isNavPagingCode:
+      return 'navigate';
+    case keyName === 'Shift' ||
+      keyName === 'ShiftRight' ||
+      keyName === 'Ctrl' ||
+      keyName === 'CtrlRight' ||
+      keyName === 'Alt' ||
+      keyName === 'AltRight' ||
+      keyName === 'Meta' ||
+      keyName === 'MetaRight' ||
+      keyName === 'CapsLock' ||
+      code === UiohookKey.Shift ||
+      code === UiohookKey.ShiftRight ||
+      code === UiohookKey.Ctrl ||
+      code === UiohookKey.CtrlRight ||
+      code === UiohookKey.Alt ||
+      code === UiohookKey.AltRight ||
+      code === UiohookKey.Meta ||
+      code === UiohookKey.MetaRight ||
+      code === UiohookKey.CapsLock:
+      return 'modifier';
+    default:
+      return 'other';
   }
-
-  // Number row 0–9 (physical keys)
-  if (keyName && /^Digit[0-9]$/.test(keyName)) {
-    console.log('[KeyClassifier:number-row]', 'keycode =', code);
-    return 'number';
-  }
-
-  // Numpad digits 0–9
-  if (keyName && /^Numpad[0-9]$/.test(keyName)) {
-    console.log('[KeyClassifier:number-numpad]', 'keycode =', code);
-    return 'number';
-  }
-
-  // Space
-  if (keyName === 'Space' || code === 44) {
-    console.log('[KeyClassifier:space]', 'keycode =', code);
-    return 'space';
-  }
-
-  // Tab
-  if (keyName === 'Tab' || code === 43) {
-    console.log('[KeyClassifier:tab]', 'keycode =', code);
-    return 'tab';
-  }
-
-  // Enter (main) + keypad Enter
-  if (keyName === 'Enter' || keyName === 'NumpadEnter' || code === 40 || code === 88) {
-    console.log('[KeyClassifier:enter]', 'keycode =', code);
-    return 'enter';
-  }
-
-  // Backspace / Delete
-  if (keyName === 'Backspace' || keyName === 'Delete' || code === 42 || code === 76) {
-    console.log('[KeyClassifier:delete]', 'keycode =', code);
-    return 'delete';
-  }
-
-  // Navigation keys
-  if (
-    keyName === 'ArrowUp' ||
-    keyName === 'ArrowDown' ||
-    keyName === 'ArrowLeft' ||
-    keyName === 'ArrowRight' ||
-    keyName === 'Home' ||
-    keyName === 'End' ||
-    keyName === 'PageUp' ||
-    keyName === 'PageDown' ||
-    (code >= 79 && code <= 82) ||
-    (code >= 74 && code <= 77)
-  ) {
-    console.log('[KeyClassifier:navigate]', 'keycode =', code);
-    return 'navigate';
-  }
-
-  // Modifiers: Shift / Ctrl / Alt / Meta
-  if (
-    keyName === 'ShiftLeft' ||
-    keyName === 'ShiftRight' ||
-    keyName === 'ControlLeft' ||
-    keyName === 'ControlRight' ||
-    keyName === 'AltLeft' ||
-    keyName === 'AltRight' ||
-    keyName === 'MetaLeft' ||
-    keyName === 'MetaRight' ||
-    (code >= 224 && code <= 231)
-  ) {
-    console.log('[KeyClassifier:modifier]', 'keycode =', code);
-    return 'modifier';
-  }
-
-  // Everything else: function keys, IME, media keys, unknown
-  console.log('[KeyClassifier:other]', 'keycode =', code);
-  return 'other';
 }
