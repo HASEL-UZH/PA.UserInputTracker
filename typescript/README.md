@@ -28,6 +28,16 @@ const tracker = new UserInputTracker(function (aggregate) {
 tracker.start();
 ```
 
+Enable detailed key categories only if needed (default: `false`):
+
+```ts
+const tracker = new UserInputTracker(
+  (aggregate) => console.log(aggregate),
+  60000,
+  true
+);
+```
+
 ## Platform specific notes
 
 Not tested on Linux

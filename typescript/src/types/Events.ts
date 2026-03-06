@@ -1,7 +1,20 @@
-import { UiohookKeyboardEvent, UiohookMouseEvent, UiohookWheelEvent } from "uiohook-napi";
+import { UiohookKeyboardEvent, UiohookMouseEvent, UiohookWheelEvent } from 'uiohook-napi';
+
+export type KeystrokeCategory =
+  | 'letter'
+  | 'number'
+  | 'navigate'
+  | 'delete'
+  | 'modifier'
+  | 'space'
+  | 'tab'
+  | 'enter'
+  | 'other';
 
 export interface ExtendedKeystrokeEvent extends UiohookKeyboardEvent {
   ts: Date;
+  /** Populated only when collectKeyDetails is enabled */
+  category?: KeystrokeCategory;
 }
 
 export interface ExtendedMouseClickEvent extends UiohookMouseEvent {
