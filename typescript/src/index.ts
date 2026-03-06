@@ -16,10 +16,6 @@ import {
   KeystrokeCategory
 } from './types/Events';
 
-type UserInputTrackerOptions = {
-  collectKeyDetails?: boolean;
-};
-
 export class UserInputTracker implements ITracker {
   name = 'User Input Monitor';
   isRunning = false;
@@ -38,13 +34,11 @@ export class UserInputTracker implements ITracker {
   constructor(
     onAggregated: (userInputAggregate: UserInputAggregate) => void,
     aggregatingInterval = 20000,
-    options: UserInputTrackerOptions | boolean = {}
+    collectKeyDetails = false
   ) {
     this.onAggregated = onAggregated;
     this.aggregatingInterval = aggregatingInterval;
-
-    this.collectKeyDetails =
-      typeof options === 'boolean' ? options : (options?.collectKeyDetails ?? false);
+    this.collectKeyDetails = collectKeyDetails;
 
     // register hooks
     this.registerUserInputHooks();
@@ -243,6 +237,8 @@ function getPhysicalKeyName(e: UiohookKeyboardEvent): string | undefined {
   return found?.[0];
 }
 
+// Classifies keycodes using the UiohookKey mapping from uiohook-napi.
+// Key names and codes: https://github.com/SnosMe/uiohook-napi
 function defaultClassifier(e: UiohookKeyboardEvent): KeystrokeCategory {
   const code = e.keycode;
   const keyName = getPhysicalKeyName(e);

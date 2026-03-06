@@ -34,7 +34,7 @@ Enable detailed key categories only if needed (default: `false`):
 const tracker = new UserInputTracker(
   (aggregate) => console.log(aggregate),
   60000,
-  { collectKeyDetails: true }
+  true
 );
 ```
 
