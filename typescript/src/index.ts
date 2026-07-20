@@ -17,7 +17,8 @@ import {
 } from './types/Events';
 
 export class UserInputTracker implements ITracker {
-  name = 'User Input Monitor';
+  static readonly NAME = 'User Input Monitor';
+  name = UserInputTracker.NAME;
   isRunning = false;
   private ref: NodeJS.Timeout | undefined;
 
