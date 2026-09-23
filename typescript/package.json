@@ -6,6 +6,9 @@
     "name": "HASEL",
     "email": "dev@hasel.dev"
   },
+  "engines": {
+    "node": "^24.15.0"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -19,12 +22,12 @@
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
+    "@types/node": "^25.5.0",
     "jest": "^29.7.0",
-    "ts-jest": "^29.1.2"
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@types/node": "^20.11.20",
-    "typescript": "^5.3.3",
     "uiohook-napi": "^1.5.5"
   }
 }
