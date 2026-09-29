@@ -4,6 +4,7 @@
     "esModuleInterop": true,
     "target": "es2019",
     "moduleResolution": "node",
+    "types": ["node", "jest"],
     "declaration": true,
     "outDir": "dist",
     "strict": true,
